@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phalcon_vuejs
+  namespace: development
+spec:
+  selector:
+    matchLabels:
+      app: vuejs
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vuejs
+    spec:
+      initContainers:
+      - name: vuejs_build
+        image: vuejs/ci
+        volumeMounts:
+        - name: app
+          mountPath: /app/public
+          command:
+          - /bin/bash
+          - -c
+          - |
+            cd /app/public
+            git clone essch/vuejs_phalcon:1.0 .
+            npm test
+            npm build
+      containers:
+      - name: healtcheck
+        image: mileschou/phalcon:7.2-cli
+        args:
+        - /bin/sh
+        - -c
+        - cd /usr/src/app && git clone essch/app_phalcon:1.0 && touch /tmp/healthy && sleep 10 && php script.php
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
+          initialDelaySeconds: 15
+          periodSeconds: 5
+      voumes:
+      - name: app
+        emptyDir: {}
