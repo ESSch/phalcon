@@ -18,7 +18,8 @@ variable "key" {
 resource "aws_eks_cluster" "example" {
   enabled_cluster_log_types = ["api", "audit"]
   name                      = "exapmle"
-  role_arn                  = "${aws_iam_role.tf_role.arn}"
+  role_arn                  = "arn:aws:iam::177510963163:role/ServiceRoleForAmazonEKS2"
+  #role_arn                  = "${aws_iam_role.ServiceRoleForAmazonEKS2.arn}"
 
   vpc_config {
     subnet_ids = ["${aws_subnet.subnet_1.id}", "${aws_subnet.subnet_2.id}"]
@@ -35,29 +36,29 @@ output "kubeconfig-certificate-authority-data" {
 
 # Role
 
-resource "aws_iam_role" "tf_role" {
-  name = "tf_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-
-  tags = {
-      tag-key = "tag-value"
-  }
-}
+#resource "aws_iam_role" "tf_role" {
+#  name = "tf_role"
+#
+#  assume_role_policy = <<EOF
+#{
+#  "Version": "2012-10-17",
+#  "Statement": [
+#    {
+#      "Action": "sts:AssumeRole",
+#      "Principal": {
+#        "Service": "eks.amazonaws.com"
+#      },
+#      "Effect": "Allow",
+#      "Sid": ""
+#}
+#  ]
+#}
+#EOF
+#
+#  tags = {
+#      tag-key = "tag-value"
+#  }
+#}
 
 
 # Subnet
@@ -65,6 +66,7 @@ EOF
 resource "aws_subnet" "subnet_1" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
 
   tags = {
     Name = "Main"
@@ -74,6 +76,7 @@ resource "aws_subnet" "subnet_1" {
 resource "aws_subnet" "subnet_2" {
   vpc_id     = "${aws_vpc.main.id}"
   cidr_block = "10.0.2.0/24"
+  availability_zone = "us-east-1b"
 
   tags = {
     Name = "Main"
