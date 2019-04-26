@@ -19,7 +19,6 @@ resource "aws_eks_cluster" "example" {
   enabled_cluster_log_types = ["api", "audit"]
   name                      = "exapmle"
   role_arn                  = "arn:aws:iam::177510963163:role/ServiceRoleForAmazonEKS2"
-  #role_arn                  = "${aws_iam_role.ServiceRoleForAmazonEKS2.arn}"
 
   vpc_config {
     subnet_ids = ["${aws_subnet.subnet_1.id}", "${aws_subnet.subnet_2.id}"]
@@ -33,33 +32,6 @@ output "endpoint" {
 output "kubeconfig-certificate-authority-data" {
   value = "${aws_eks_cluster.example.certificate_authority.0.data}"
 }
-
-# Role
-
-#resource "aws_iam_role" "tf_role" {
-#  name = "tf_role"
-#
-#  assume_role_policy = <<EOF
-#{
-#  "Version": "2012-10-17",
-#  "Statement": [
-#    {
-#      "Action": "sts:AssumeRole",
-#      "Principal": {
-#        "Service": "eks.amazonaws.com"
-#      },
-#      "Effect": "Allow",
-#      "Sid": ""
-#}
-#  ]
-#}
-#EOF
-#
-#  tags = {
-#      tag-key = "tag-value"
-#  }
-#}
-
 
 # Subnet
 
