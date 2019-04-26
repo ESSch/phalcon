@@ -35,25 +35,20 @@ output "kubeconfig-certificate-authority-data" {
 
 # Role
 
+data "aws_iam_policy_document" "eks-role-policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["eks.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_role" "tf_role" {
   name = "tf_role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "eks.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-
+  assume_role_policy = "${data.aws_iam_policy_document.eks-role-policy.json}"
   tags = {
       tag-key = "tag-value"
   }
