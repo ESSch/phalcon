@@ -33,6 +33,42 @@ output "kubeconfig-certificate-authority-data" {
   value = "${aws_eks_cluster.example.certificate_authority.0.data}"
 }
 
+# Role
+
+resource "aws_iam_role" "tf_role" {
+  name = "tf_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "eks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = {
+      tag-key = "tag-value"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "attach-cluster" {
+  role       = "tf_role"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "attach-service" {
+  role       = "tf_role"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+}
+
 # Subnet
 
 resource "aws_subnet" "subnet_1" {
